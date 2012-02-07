@@ -3,12 +3,13 @@ package tokens;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class KeywordToken extends Token
 {
     private static final Type myTokenType = Token.Type.KEYWORD;
     private static final List<String> recognizedKeywords = initializeKeywordList();
     private String myKeyword;
-    
+
     public KeywordToken (String keyword)
     {
         super();
@@ -27,27 +28,29 @@ public class KeywordToken extends Token
     {
         return new KeywordToken(parseableString);
     }
-    
+
+    @Override
     public Type getTokenType ()
     {
         return myTokenType;
     }
-    
+
+    @Override
     public String getType ()
     {
         return myType;
     }
-    
-    public String getKeyword()
+
+    public String getKeyword ()
     {
         return myKeyword;
     }
-        
+
     public static boolean isKeyword (String parseableString)
     {
         return (recognizedKeywords.contains(parseableString));
     }
-    
+
     private static List<String> initializeKeywordList ()
     {
         String[] recognizedKeywords =
@@ -71,7 +74,7 @@ public class KeywordToken extends Token
             keywordList.add(keyword);
         return keywordList;
     }
-    
+
     private KeywordToken ()
     {}
 
@@ -79,5 +82,5 @@ public class KeywordToken extends Token
     {
         return new TokenFactory(new KeywordToken());
     }
-    
+
 }

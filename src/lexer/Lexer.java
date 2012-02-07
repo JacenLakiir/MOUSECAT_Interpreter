@@ -11,6 +11,7 @@ import javax.swing.JFileChooser;
 import tokens.Token;
 import tokens.TokenFactory;
 
+
 public class Lexer
 {
     // single instance of lexer
@@ -21,9 +22,10 @@ public class Lexer
     private static Scanner myInput;
     private static Map<String, Token> mySymbolTable;
     private static final List<TokenFactory> typesOfTokens = TokenFactory.initialize();
-    
-    private Lexer () { }
-    
+
+    private Lexer ()
+    {}
+
     public static Lexer getInstance ()
     {
         if (myLexer == null)
@@ -33,17 +35,16 @@ public class Lexer
         }
         return myLexer;
     }
-    
+
     public void initializeScanner ()
     {
         myFile = chooseFile();
         myInput = openFile();
     }
-    
+
     public void runScanner ()
     {
-        if (myInput == null)
-            return;
+        if (myInput == null) return;
         printSymbolTableHeader();
         int lineNumber = 0;
         String[] line;
@@ -74,21 +75,21 @@ public class Lexer
 
     public File chooseFile ()
     {
-        JFileChooser fileChooser =  new JFileChooser(System.getProperties().getProperty("user.dir"));
+        JFileChooser fileChooser = new JFileChooser(System.getProperties().getProperty("user.dir"));
         int option = fileChooser.showOpenDialog(null);
-        if (option != JFileChooser.APPROVE_OPTION) {
+        if (option != JFileChooser.APPROVE_OPTION)
+        {
             return null;
         }
         return fileChooser.getSelectedFile();
     }
-    
+
     public Scanner openFile ()
     {
-        if (myFile == null)
-            return null;
+        if (myFile == null) return null;
         if (!isValidExtension())
             throw new LexerException("File extension is not valid (must end in \".mc\")",
-                                       LexerException.Type.INVALID_FILE_EXTENSION);
+                                     LexerException.Type.INVALID_FILE_EXTENSION);
         FileInputStream fstream;
         try
         {
@@ -110,12 +111,13 @@ public class Lexer
             if (tokenType.isThisTypeOfToken(parseableString))
                 return tokenType.createThisTypeOfToken(parseableString);
         }
-        throw new LexerException("Invalid token: " + parseableString, LexerException.Type.INVALID_TOKEN);
+        throw new LexerException("Invalid token: " + parseableString,
+                                 LexerException.Type.INVALID_TOKEN);
     }
-    
+
     private Token updateSymbolTable (Token parsedToken)
     {
-        boolean needToUpdate = isSymbolTableUpdateNecessary(parsedToken);            
+        boolean needToUpdate = isSymbolTableUpdateNecessary(parsedToken);
         if (needToUpdate)
         {
             if (!mySymbolTable.containsKey(parsedToken.getCharacterValue()))
@@ -124,7 +126,7 @@ public class Lexer
         }
         return null;
     }
-    
+
     private void printSymbolTableHeader ()
     {
         StringBuffer header = new StringBuffer();
@@ -132,7 +134,7 @@ public class Lexer
         header.append(String.format("%-20s %-20s %-20s", "====", "========", "========="));
         System.out.println(header.toString());
     }
-    
+
     private void printSymbolTableLine (Token parsedToken, boolean enteredIntoTable)
     {
         StringBuffer line = new StringBuffer();
@@ -144,18 +146,18 @@ public class Lexer
         }
         System.out.println(line.toString());
     }
-    
-    private boolean isValidExtension()
+
+    private boolean isValidExtension ()
     {
         return (myFile.getAbsolutePath().toLowerCase().endsWith(".mc"));
     }
-    
+
     private boolean isSymbolTableUpdateNecessary (Token parsedToken)
     {
         Token.Type parsedTokenType = parsedToken.getTokenType();
         return (parsedTokenType == Token.Type.VARIABLE || parsedTokenType == Token.Type.INTEGER);
     }
-    
+
     private void reportError (String parseableString, int lineNumber)
     {
         StringBuffer error = new StringBuffer();
@@ -165,13 +167,12 @@ public class Lexer
         error.append("---------------------------------------------------");
         System.err.println(error.toString());
     }
-    
+
     public File getFile ()
     {
         return myFile;
     }
-    
-    
+
     public void setFile (String filePath)
     {
         myFile = new File(filePath);

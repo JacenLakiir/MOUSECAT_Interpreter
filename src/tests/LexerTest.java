@@ -1,5 +1,8 @@
 package tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import lexer.Lexer;
 import lexer.LexerException;
 import org.junit.After;
@@ -9,14 +12,12 @@ import tokens.IntegerToken;
 import tokens.KeywordToken;
 import tokens.PunctuationToken;
 import tokens.VariableToken;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
 
 // add tests for character and integer values of tokens
 public class LexerTest
 {
-    
+
     private Lexer myLexer;
 
     @Before
@@ -24,7 +25,7 @@ public class LexerTest
     {
         myLexer = Lexer.getInstance();
     }
-    
+
     @Test
     public void testTokenTypes ()
     {
@@ -50,7 +51,7 @@ public class LexerTest
         runExceptionalTokenAssertion("123", VariableToken.class);
         runExceptionalTokenAssertion("91238", IntegerToken.class);
     }
-    
+
     @Test
     public void testLexerExceptions ()
     {
@@ -58,14 +59,15 @@ public class LexerTest
     }
 
     @After
-    public void tearDown () { }
+    public void tearDown ()
+    {}
 
     private void runTokenTest (String parseableString, Class<?> expectedTokenType)
     {
         Object parsedToken = myLexer.createToken(parseableString);
         assertTrue(expectedTokenType.isInstance(parsedToken));
     }
-    
+
     private void runExceptionalLexerTest (LexerException.Type type, String fileName)
     {
         myLexer.setFile(fileName);
@@ -79,7 +81,7 @@ public class LexerTest
             assertEquals(type, e.getType());
         }
     }
-    
+
     private void runExceptionalTokenTest (String parseableString)
     {
         try
@@ -93,7 +95,7 @@ public class LexerTest
             assertEquals(LexerException.Type.INVALID_TOKEN, e.getType());
         }
     }
-    
+
     private void runExceptionalTokenAssertion (String parseableString, Class<?> expectedTokenType)
     {
         try
@@ -106,5 +108,5 @@ public class LexerTest
             return;
         }
     }
-    
+
 }

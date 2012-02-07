@@ -3,6 +3,7 @@ package tokens;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class IntegerToken extends Token
 {
     private static final Type myTokenType = Token.Type.INTEGER;
@@ -15,7 +16,7 @@ public class IntegerToken extends Token
         myCharacterValue = integerString;
         myIntegerValue = Integer.parseInt(integerString);
     }
-    
+
     @Override
     public boolean isThisTypeOfToken (String parseableString)
     {
@@ -29,26 +30,30 @@ public class IntegerToken extends Token
         return new IntegerToken(parseableString);
     }
 
+    @Override
     public Type getTokenType ()
     {
         return myTokenType;
     }
-    
+
+    @Override
     public String getType ()
     {
         return myType;
     }
-    
+
+    @Override
     public String getCharacterValue ()
     {
         return myCharacterValue;
     }
-    
+
+    @Override
     public Integer getIntegerValue ()
     {
         return myIntegerValue;
     }
-    
+
     private IntegerToken ()
     {}
 
@@ -56,5 +61,5 @@ public class IntegerToken extends Token
     {
         return new TokenFactory(new IntegerToken());
     }
-  
+
 }

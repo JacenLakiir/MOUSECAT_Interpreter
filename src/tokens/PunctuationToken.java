@@ -3,6 +3,7 @@ package tokens;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class PunctuationToken extends Token
 {
     private static final Type myTokenType = Token.Type.PUNCTUATION_SYMBOL;
@@ -13,7 +14,7 @@ public class PunctuationToken extends Token
     {
         super();
     }
-    
+
     @Override
     public boolean isThisTypeOfToken (String parseableString)
     {
@@ -26,17 +27,19 @@ public class PunctuationToken extends Token
     {
         return new PunctuationToken(parseableString);
     }
-    
+
+    @Override
     public Type getTokenType ()
     {
         return myTokenType;
     }
-    
+
+    @Override
     public String getType ()
     {
         return myType;
     }
-    
+
     private PunctuationToken ()
     {}
 
