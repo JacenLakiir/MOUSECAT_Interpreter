@@ -22,7 +22,7 @@ public class VariableToken extends Token
     public boolean isThisTypeOfToken (String parseableString)
     {
         Matcher variableMatcher = myRegex.matcher(parseableString);
-        return (variableMatcher.lookingAt() && isValidVariable(parseableString));
+        return (variableMatcher.matches() && isValidVariable(parseableString));
     }
 
     @Override

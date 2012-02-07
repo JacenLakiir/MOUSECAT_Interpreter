@@ -18,7 +18,7 @@ public class PunctuationToken extends Token
     public boolean isThisTypeOfToken (String parseableString)
     {
         Matcher punctationMatcher = myRegex.matcher(parseableString);
-        return (punctationMatcher.lookingAt());
+        return (punctationMatcher.matches());
     }
 
     @Override

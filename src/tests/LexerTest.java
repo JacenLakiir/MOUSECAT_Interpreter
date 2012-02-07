@@ -13,6 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+// add tests for character and integer values of tokens
 public class LexerTest
 {
     
@@ -44,9 +45,9 @@ public class LexerTest
         runExceptionalTokenTest(".");
         runExceptionalTokenTest("");
         runExceptionalTokenTest("   ");
+        runExceptionalTokenTest("04");
         runExceptionalTokenAssertion("counterclockwise", KeywordToken.class);
         runExceptionalTokenAssertion("123", VariableToken.class);
-        runExceptionalTokenAssertion("04", IntegerToken.class);
         runExceptionalTokenAssertion("91238", IntegerToken.class);
     }
     

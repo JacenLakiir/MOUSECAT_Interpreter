@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public class IntegerToken extends Token
 {
     private static final Type myTokenType = Token.Type.INTEGER;
-    private static final Pattern myRegex = Pattern.compile("0|[1-9][0-9][0-9]");
+    private static final Pattern myRegex = Pattern.compile("0|[1-9][0-9]{0,2}");
     private static final String myType = "integer";
 
     public IntegerToken (String integerString)
@@ -20,7 +20,7 @@ public class IntegerToken extends Token
     public boolean isThisTypeOfToken (String parseableString)
     {
         Matcher integerMatcher = myRegex.matcher(parseableString);
-        return (integerMatcher.lookingAt() && !KeywordToken.isKeyword(parseableString));
+        return (integerMatcher.matches() && !KeywordToken.isKeyword(parseableString));
     }
 
     @Override
