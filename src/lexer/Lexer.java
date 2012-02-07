@@ -52,23 +52,7 @@ public class Lexer
         {
             line = myInput.nextLine().split("\\s+");
             lineNumber++;
-            for (String parseableString : line)
-            {
-                if (parseableString.length() == 0) continue;
-                if (parseableString.startsWith("//")) break;
-                try
-                {
-                    Token parsedToken = createToken(parseableString);
-                    updateSymbolTable(parsedToken);
-                    boolean enteredIntoTable = isSymbolTableUpdateNecessary(parsedToken);
-                    printSymbolTableLine(parsedToken, enteredIntoTable);
-                }
-                catch (LexerException e)
-                {
-                    if (e.getType() == LexerException.Type.INVALID_TOKEN)
-                        reportError(parseableString, lineNumber);
-                }
-            }
+            parseLine(lineNumber, line);
         }
         return;
     }
@@ -103,7 +87,7 @@ public class Lexer
         Scanner in = new Scanner(fstream);
         return in;
     }
-
+    
     public Token createToken (String parseableString)
     {
         for (TokenFactory tokenType : typesOfTokens)
@@ -113,6 +97,32 @@ public class Lexer
         }
         throw new LexerException("Invalid token: " + parseableString,
                                  LexerException.Type.INVALID_TOKEN);
+    }
+    
+    private void parseLine (int lineNumber, String[] line)
+    {
+        for (String parseableString : line)
+        {
+            if (parseableString.length() == 0) continue;
+            if (parseableString.startsWith("//")) break;
+            try
+            {
+                identifyAndStoreToken(parseableString);
+            }
+            catch (LexerException e)
+            {
+                if (e.getType() == LexerException.Type.INVALID_TOKEN)
+                    reportError(parseableString, lineNumber);
+            }
+        }
+    }
+
+    private void identifyAndStoreToken (String parseableString)
+    {
+        Token parsedToken = createToken(parseableString);
+        updateSymbolTable(parsedToken);
+        boolean enteredIntoTable = isSymbolTableUpdateNecessary(parsedToken);
+        printSymbolTableLine(parsedToken, enteredIntoTable);
     }
 
     private Token updateSymbolTable (Token parsedToken)
