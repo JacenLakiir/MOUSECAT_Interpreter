@@ -14,19 +14,41 @@ import tokens.PunctuationToken;
 import tokens.VariableToken;
 
 
-// add tests for character and integer values of tokens
+/**
+ * JUnit tests for parsing tokens and token/lexer exceptions.
+ * 
+ * @author Eric Mercer (ewm10)
+ */
 public class LexerTest
 {
 
     private Lexer myLexer;
 
     @Before
+    /**
+     * Instantiate necessary variables before beginning tests.
+     */
     public void setUp ()
     {
         myLexer = Lexer.getInstance();
     }
+    
+    @Test
+    /**
+     * Runs a suite of tests to check whether exceptions are thrown for
+     * various file access operations, such as choosing and opening a file.
+     */
+    public void testLexerExceptions ()
+    {
+        runExceptionalLexerTest(LexerException.Type.INVALID_FILE_EXTENSION, "test.py");
+        runExceptionalLexerTest(LexerException.Type.CANNOT_OPEN_FILE, "test.mc");
+    }
 
     @Test
+    /**
+     * Runs a suite of tests to check whether tokens are being created
+     * correctly.
+     */
     public void testTokenTypes ()
     {
         runTokenTest("clockwise", KeywordToken.class);
@@ -41,6 +63,11 @@ public class LexerTest
     }
 
     @Test
+    /**
+     * Runs a suite of tests to check whether exceptions are thrown for
+     * various invalid tokens and checks some overlapping cases whether
+     * a string could be accidentally parsed as a wrong type of token.
+     */
     public void testTokenExceptions ()
     {
         runExceptionalTokenTest(".");
@@ -52,22 +79,16 @@ public class LexerTest
         runExceptionalTokenAssertion("91238", IntegerToken.class);
     }
 
-    @Test
-    public void testLexerExceptions ()
-    {
-        runExceptionalLexerTest(LexerException.Type.INVALID_FILE_EXTENSION, "test.py");
-    }
-
     @After
     public void tearDown ()
     {}
 
-    private void runTokenTest (String parseableString, Class<?> expectedTokenType)
-    {
-        Object parsedToken = myLexer.createToken(parseableString);
-        assertTrue(expectedTokenType.isInstance(parsedToken));
-    }
-
+    /**
+     * Tests whether a non-valid file will throw the correct LexerException.
+     * 
+     * @param type expected LexerException type
+     * @param fileName path of file to be opened
+     */
     private void runExceptionalLexerTest (LexerException.Type type, String fileName)
     {
         myLexer.setFile(fileName);
@@ -81,7 +102,27 @@ public class LexerTest
             assertEquals(type, e.getType());
         }
     }
+    
+    /**
+     * Tests whether the token created from the given string is of the
+     * correct type (i.e. whether parseableString is an instance of
+     * the class given as expectedTokenType).
+     * 
+     * @param parseableString
+     * @param expectedTokenType
+     */
+    private void runTokenTest (String parseableString, Class<?> expectedTokenType)
+    {
+        Object parsedToken = myLexer.createToken(parseableString);
+        assertTrue(expectedTokenType.isInstance(parsedToken));
+    }
 
+    /**
+     * Test whether the given string is successfully identified as an invalid
+     * token.
+     * 
+     * @param parseableString
+     */
     private void runExceptionalTokenTest (String parseableString)
     {
         try
@@ -96,6 +137,14 @@ public class LexerTest
         }
     }
 
+    /**
+     * Tests whether the token created from the given string is of the incorrect
+     * type (i.e. whether the assertion that parseableString is an instance of
+     * the class given as expectedTokenType fails).
+     * 
+     * @param parseableString
+     * @param expectedTokenType
+     */
     private void runExceptionalTokenAssertion (String parseableString, Class<?> expectedTokenType)
     {
         try
@@ -104,7 +153,7 @@ public class LexerTest
         }
         catch (AssertionError e)
         {
-            // nothing to check
+            // nothing else to check (just checking for AssertionError)
             return;
         }
     }

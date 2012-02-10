@@ -4,17 +4,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+/**
+ * Defines a Variable Token. Valid variable names may contain any number of
+ * letters and digits (as long as it is a keyword) and are case-insensitive. If
+ * a variable name contains a digit and is of length 3 or less, then it must
+ * have at least one letter. The character value is the lowercase variable name
+ * and the integer value is 0.
+ * 
+ * @author Eric Mercer (ewm10)
+ */
 public class VariableToken extends Token
 {
     private static final Type myTokenType = Token.Type.VARIABLE;
     private static final Pattern myRegex = Pattern.compile("[A-z|0-9]+");
     private static String myType = "variable";
-    private String myVariable;
 
+    /**
+     * Constructs a new VariableToken whose character value is the given string
+     * cast to lowercase. Its integer value is 0.
+     * 
+     * @param keyword
+     */
     public VariableToken (String variableName)
     {
         super();
-        myVariable = variableName.toLowerCase();
         myCharacterValue = variableName.toLowerCase();
         myIntegerValue = 0;
     }
@@ -56,11 +69,15 @@ public class VariableToken extends Token
         return myIntegerValue;
     }
 
-    public String getVariable ()
-    {
-        return myVariable;
-    }
-
+    /**
+     * Checks whether a given string matches the additional constraints imposed
+     * on being classified as a variable token beyond matching the basic regular
+     * expression description. If a variable name contains a digit and is of
+     * length 3 or less, then it must have at least one letter to be valid.
+     * 
+     * @param parseableString
+     * @return true if given string meets constraints
+     */
     private static boolean isValidVariable (String parseableString)
     {
         boolean isValid = !KeywordToken.isKeyword(parseableString);
@@ -70,6 +87,12 @@ public class VariableToken extends Token
 
     }
 
+    /**
+     * Checks whether a given string contains at least one digit.
+     * 
+     * @param parseableString
+     * @return true if given string includes a digit
+     */
     private static boolean containsDigit (String parseableString)
     {
         Pattern digitRegex = Pattern.compile(".*[0-9].*");
@@ -77,6 +100,12 @@ public class VariableToken extends Token
         return digitMatcher.lookingAt();
     }
 
+    /**
+     * Checks whether a given string contains at least one letter.
+     * 
+     * @param parseableString
+     * @return true if given string includes a letter
+     */
     private static boolean containsLetter (String parseableString)
     {
         Pattern letterRegex = Pattern.compile(".*[A-z].*");
@@ -84,9 +113,18 @@ public class VariableToken extends Token
         return letterMatcher.lookingAt();
     }
 
+    /**
+     * Private constructor used for creating a TokenFactory for this type of
+     * token.
+     */
     private VariableToken ()
     {}
 
+    /**
+     * Creates a factory for use in identifying and constructing VariableTokens.
+     * 
+     * @return new factory for VariableTokens
+     */
     public static TokenFactory getFactory ()
     {
         return new TokenFactory(new VariableToken());
