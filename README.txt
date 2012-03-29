@@ -1,21 +1,21 @@
 =================
-README: Project 1
+README: Project 2
 =================
 
 Name: Eric Mercer (ewm10)
 
-Started:  2/5/12
-Finished: 2/9/12
+Started:  3/28/12
+Finished: ???
 
-Project Length: 8 hours
+Project Length: ???
 
 Discussed with:
-- Professor Rodger (accessing and updating the symbol table)
+- ???
 
 Resources:
-- none
+- ???
 
-How to Run the Scanner:
+How to Run the Parser:
 - In Eclipse, open MouseCat.java (in the default package).
 - Run MouseCat.java as a Java Application.
 - Choose a file on which to run the interpreter using the file dialog box that pops up.
@@ -23,3 +23,4 @@ How to Run the Scanner:
 
 How to Run JUnit Tests:
 - Open LexerTest.java (in the tests package) and run as JUnit Test.
+- Open ParserText.java (in the tests package) and run as JUnit Test.
