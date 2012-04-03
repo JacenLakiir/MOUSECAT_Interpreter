@@ -5,15 +5,15 @@ README: Project 2
 Name: Eric Mercer (ewm10)
 
 Started:  3/28/12
-Finished: ???
+Finished: 4/2/12
 
-Project Length: ???
+Project Length: 10 hours
 
 Discussed with:
-- ???
+- no one
 
 Resources:
-- ???
+- none
 
 How to Run the Parser:
 - In Eclipse, open MouseCat.java (in the default package).
