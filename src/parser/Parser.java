@@ -1,15 +1,27 @@
 package parser;
 
+import grammar.Production;
 import java.util.Stack;
+import lexer.Lexer;
 
+/**
+ * Parses a MOUSECAT program in order to determine syntactical correctness.
+ * 
+ * @author Eric Mercer (ewm10)
+ */
 public class Parser
 {
     // single instance of parser
     private static Parser myParser;
 
     // state of the parser
-    private Stack myStack;
     private String myState;
+    private String mySymbol;
+    private boolean wasFileChosen;
+    
+    private ParseTable myTable;
+    private Stack<String> myParseStack;
+    private Stack<Production> myRuleStack;
    
     /**
      * Private constructor used for restricting instantiation of Parser objects.
@@ -17,8 +29,12 @@ public class Parser
      */
     private Parser ()
     {
-        myStack = new Stack<String>();
         myState = "0";
+        mySymbol = "";
+        wasFileChosen = Lexer.getInstance().wasFileChosen();
+        
+        myParseStack = new Stack<String>();
+        myRuleStack = new Stack<Production>();
     }
 
     /**
@@ -39,36 +55,90 @@ public class Parser
         return myParser;
     }
     
+    /**
+     * Builds a parsetable for the MouseCat programming language.
+     */
+    public void initializeParser ()
+    {
+        if (!wasFileChosen)     return;
+        myTable = new ParseTable();
+    }
+    
+    /**
+     * Parses a MouseCat program symbol-by-symbol to produce rightmost derivations.
+     */
     public void runParser ()
     {
-        myStack.push(myState);
-//        read (symbol)
-//        entry = T[state, symbol]
-//        while entry.action != accept
-//        {
-//            if entry.action == shift
-//            {
-//                push(symbol)
-//                state = entry.state
-//                push(state)
-//                read(symbol)
-//            }
-//            else if entry.action == reduce
-//            {
-//                for (int i = 0; i < 2*size_rhs; i++)
-//                    myStack.pop();
-//                myState = myStack.peek()
-//                myStack.push(entry.rule.lhs)
-//                myState = T[state, entry.rule.lhs]
-//                myStack.push(myState)        
-//            }
-//            else if entry.action == blank
-//            {
-//                error()
-//            }
-//            entry = T[state, symbol]
-//        }
-//        if symbol != $
-//            error()
+        if (!wasFileChosen)     return;
+        
+        myParseStack.push(myState);
+        mySymbol = Lexer.getInstance().getNextSymbol();
+        
+        Entry entry = myTable.lookupEntry(myState, mySymbol);
+        String action = entry.getAction();
+        
+        while (!Entry.isAccept(action))
+        {
+            if (Entry.isShift(action))
+            {
+                performShift(entry);
+            }
+            else if (Entry.isReduce(action))
+            {
+                performReduce(entry);    
+            }
+            else if (Entry.isError(action))
+            {
+                ParserOutput.reportError();
+                return;
+            }
+            entry = myTable.lookupEntry(myState, mySymbol);
+            action = entry.getAction();
+        }
+        
+        if (!mySymbol.equals("$"))
+        {
+            ParserOutput.reportError();
+        }
+        
+        ParserOutput.printDerivations(myRuleStack);
     }
+
+    /**
+     * Shifts the current symbol (lookahead) and state number onto the parsing
+     * stack. Transitions the state to the pushed state number and retrieves
+     * the next lookahead.
+     * 
+     * @param entry
+     */
+    private void performShift (Entry entry)
+    {
+        myParseStack.push(mySymbol);
+        myState = entry.getState();
+        myParseStack.push(myState);
+        mySymbol = Lexer.getInstance().getNextSymbol();
+    }
+
+    /**
+     * Replaces the right-hand side (rhs) of the rewrite rule on top of the
+     * parsing stack with the left-hand side (lhs). Transitions the state to
+     * the one stored in the parse table entry associated with the current
+     * state and lhs symbol.
+     * 
+     * @param entry
+     */
+    private void performReduce (Entry entry)
+    {
+        int sizeOfRHS = entry.sizeOfRHS();
+        for (int i = 0; i < 2*sizeOfRHS; i++)
+            myParseStack.pop();
+        myState = myParseStack.peek();
+        
+        myParseStack.push(entry.ruleLHS());
+        myRuleStack.push(entry.getRule());
+        
+        myState = myTable.lookupEntry(myState, entry.ruleLHS()).getState();
+        myParseStack.push(myState);
+    }
+    
 }

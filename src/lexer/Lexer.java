@@ -3,8 +3,10 @@ package lexer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.TreeMap;
 import javax.swing.JFileChooser;
@@ -24,17 +26,22 @@ public class Lexer
     private static Lexer myLexer;
 
     // state of the lexer
-    private static File myFile;
-    private static Scanner myInput;
-    private static Map<String, Token> mySymbolTable;
-    private static final List<TokenFactory> typesOfTokens = TokenFactory.initialize();
+    private final List<TokenFactory> typesOfTokens = TokenFactory.initialize();
     
+    private File myFile;
+    private Scanner myInput;
+    private Queue<String> mySymbolQueue;
+    private Map<String, Token> mySymbolTable;
+        
     /**
      * Private constructor used for restricting instantiation of Lexer objects.
      * (Singleton pattern)
      */
     private Lexer ()
-    {}
+    {
+        mySymbolTable = new TreeMap<String, Token>();
+        mySymbolQueue = new LinkedList<String>();
+    }
 
     /**
      * Limits access to this class's constructor so that only one Lexer is ever
@@ -50,7 +57,6 @@ public class Lexer
         if (myLexer == null)
         {
             myLexer = new Lexer();
-            mySymbolTable = new TreeMap<String, Token>();
         }
         return myLexer;
     }
@@ -95,7 +101,7 @@ public class Lexer
      */
     public Scanner openFile ()
     {
-        if (myFile == null) return null;
+        if (!wasFileChosen()) return null;
         if (!hasValidExtension())
             throw new LexerException("File extension is not valid (must end in \".mc\")",
                                      LexerException.Type.INVALID_FILE_EXTENSION);
@@ -118,8 +124,8 @@ public class Lexer
      */
     public void runScanner ()
     {
-        if (myInput == null) return;
-        printOutputHeader();
+        if (!wasFileChosen()) return;
+//        LexerOutput.printHeader();
         int lineNumber = 0;
         while (myInput.hasNextLine())
         {
@@ -127,6 +133,7 @@ public class Lexer
             String[] line = myInput.nextLine().split("\\s+");
             parseLine(lineNumber, line);
         }
+        mySymbolQueue.add("$");
         return;
     }
     
@@ -150,6 +157,26 @@ public class Lexer
         }
         throw new LexerException("Invalid token: " + parseableString,
                                  LexerException.Type.INVALID_TOKEN);
+    }    
+    
+    /**
+     * Checks whether the user selected a file.
+     * 
+     * @return true if file selected
+     */
+    public boolean wasFileChosen ()
+    {
+        return (myFile != null);
+    }
+    
+    /**
+     * Convenience method for retrieving the next symbol in the queue.
+     * 
+     * @return next symbol
+     */
+    public String getNextSymbol ()
+    {
+        return mySymbolQueue.poll();
     }
     
     public File getFile ()
@@ -185,14 +212,15 @@ public class Lexer
             catch (LexerException e)
             {
                 if (e.getType() == LexerException.Type.INVALID_TOKEN)
-                    reportError(parseableString, lineNumber);
+                    LexerOutput.reportError(parseableString, lineNumber);
             }
         }
     }
 
     /**
      * Creates a token of the appropriate type for the given string and updates
-     * the symbol table. Output is printed showing the results of the token
+     * the symbol table. Adds the token's symbol to the queue of symbol scanned
+     * in so far. Output is printed showing the results of the token
      * identification and storage.
      * 
      * @param parseableString
@@ -201,8 +229,11 @@ public class Lexer
     {
         Token parsedToken = createToken(parseableString);
         updateSymbolTable(parsedToken);
-        boolean isEnteredIntoTable = isUpdateNecessary(parsedToken);
-        printTokenOutput(parsedToken, isEnteredIntoTable);
+        
+        String tokenSymbol = parsedToken.getSymbol();
+        mySymbolQueue.add(tokenSymbol);
+//        boolean isEnteredIntoTable = isUpdateNecessary(parsedToken);
+//        LexerOutput.printTokenOutput(parsedToken, isEnteredIntoTable);
     }
 
     /**
@@ -221,55 +252,6 @@ public class Lexer
         if (!mySymbolTable.containsKey(charVal))
             mySymbolTable.put(charVal, parsedToken);
         return mySymbolTable.get(charVal);
-    }
-
-    /**
-     * Prints the output header as a table with three columns: Type,
-     * CharacterValue, and IntegerValue.
-     */
-    private void printOutputHeader ()
-    {
-        StringBuffer header = new StringBuffer();
-        header.append(String.format("%-20s %-20s %-20s\n", "TYPE", "CH VALUE", "INT VALUE"));
-        header.append(String.format("%-20s %-20s %-20s", "====", "========", "========="));
-        System.out.println(header.toString());
-    }
-
-    /**
-     * Prints a line of output with the given token's type and, if the symbol
-     * table was updated for this token, its character and integer values
-     * formatted into three columns.
-     * 
-     * @param parsedToken
-     * @param enteredIntoTable true if the symbol table was accessed for the given token
-     */
-    private void printTokenOutput (Token parsedToken, boolean enteredIntoTable)
-    {
-        StringBuffer line = new StringBuffer();
-        line.append(String.format("%-20s ", parsedToken.getType()));
-        if (enteredIntoTable)
-        {
-            line.append(String.format("%-20s ", parsedToken.getCharacterValue()));
-            line.append(String.format("%-20s", parsedToken.getIntegerValue()));
-        }
-        System.out.println(line.toString());
-    }
-    
-    /**
-     * Prints output reporting that an invalid token has been found and where in
-     * the file it is located.
-     * 
-     * @param parseableString word that triggered the error
-     * @param lineNumber line in file in which the error occurred
-     */
-    private void reportError (String parseableString, int lineNumber)
-    {
-        StringBuffer error = new StringBuffer();
-        error.append("---------------------------------------------------\n");
-        error.append("Line " + lineNumber + ": ");
-        error.append("invalid token \"" + parseableString + "\"\n");
-        error.append("---------------------------------------------------");
-        System.err.println(error.toString());
     }
 
     /**

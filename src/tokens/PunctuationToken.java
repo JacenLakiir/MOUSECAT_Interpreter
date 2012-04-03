@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 
 
 /**
- * Defines a Punctuation Symbol Token. The only valid punctuation symbol is
- * semicolon (";"). Punctuation symbols do not have values.
+ * Defines a Punctuation Token. The only valid punctuation symbol is semicolon
+ * (";"). Punctuation Tokens do not have values.
  * 
  * @author Eric Mercer (ewm10)
  */
@@ -24,6 +24,7 @@ public class PunctuationToken extends Token
     public PunctuationToken (String integerString)
     {
         super();
+        mySymbol = ";";
     }
 
     @Override
@@ -49,6 +50,12 @@ public class PunctuationToken extends Token
     public String getType ()
     {
         return myType;
+    }
+    
+    @Override
+    public String getSymbol ()
+    {
+        return mySymbol;
     }
 
     /**

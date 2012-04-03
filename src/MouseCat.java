@@ -1,10 +1,10 @@
 import lexer.Lexer;
-
+import parser.Parser;
 
 /**
  * Runs interpreter for the MOUSECAT programming language.
  * 
- * (Currently only the scanner has been implemented.)
+ * (Currently only the scanner and parser have been implemented.)
  * 
  * @author Eric Mercer (ewm10)
  */
@@ -15,6 +15,9 @@ public class MouseCat
         Lexer lex = Lexer.getInstance();
         lex.initializeScanner();
         lex.runScanner();
-        return;
+        
+        Parser pars = Parser.getInstance();
+        pars.initializeParser();
+        pars.runParser();
     }
 }

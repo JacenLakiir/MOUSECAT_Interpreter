@@ -20,6 +20,7 @@ public abstract class Token
     protected static String myType;
     protected String myCharacterValue;
     protected Integer myIntegerValue;
+    protected String mySymbol;
 
     public Token ()
     {}
@@ -60,6 +61,11 @@ public abstract class Token
     }
 
     public Integer getIntegerValue ()
+    {
+        return null;
+    }
+    
+    public String getSymbol ()
     {
         return null;
     }

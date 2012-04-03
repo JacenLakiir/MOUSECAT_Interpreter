@@ -1,15 +1,15 @@
 0 P' P
-1 P size int int begin L halt
+1 P z i i b L t
 2 L S ;
-3 S L S ;
-4 S cat var int int D
-5 S mouse var int int D
-6 S hole int int
-7 S move var
-8 S move var int
-9 S clockwise var
-10 S repeat int L end
-11 D north
-12 D south
-13 D east
-14 D west
+3 L L S ;
+4 S c v i i D
+5 S m v i i D
+6 S h i i
+7 S o v
+8 S o v i
+9 S l v
+10 S r i L d
+11 D n
+12 D s
+13 D e
+14 D w

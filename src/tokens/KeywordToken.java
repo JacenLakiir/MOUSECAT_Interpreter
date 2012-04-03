@@ -14,7 +14,6 @@ public class KeywordToken extends Token
 {
     private static final Type myTokenType = Token.Type.KEYWORD;
     private static final List<String> recognizedKeywords = initializeKeywordList();
-    private String myKeyword;
 
     /**
      * Constructs a new KeywordToken whose keyword is the given string. No
@@ -25,8 +24,8 @@ public class KeywordToken extends Token
     public KeywordToken (String keyword)
     {
         super();
-        myKeyword = keyword;
         myType = keyword.toLowerCase();
+        mySymbol = determineSymbol(keyword);
     }
 
     @Override
@@ -52,10 +51,21 @@ public class KeywordToken extends Token
     {
         return myType;
     }
-
-    public String getKeyword ()
+    
+    @Override
+    public String getSymbol ()
     {
-        return myKeyword;
+        return mySymbol;
+    }
+    
+    private String determineSymbol (String keyword)
+    {
+        if (keyword.equals("size"))         return "z";
+        if (keyword.equals("move"))         return "o";
+        if (keyword.equals("clockwise"))    return "l";
+        if (keyword.equals("end"))          return "d";
+        if (keyword.equals("halt"))         return "t";
+        return keyword.substring(0, 1);
     }
 
     /**

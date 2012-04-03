@@ -28,6 +28,7 @@ public class IntegerToken extends Token
         super();
         myCharacterValue = integerString;
         myIntegerValue = Integer.parseInt(integerString);
+        mySymbol = "i";
     }
 
     @Override
@@ -65,6 +66,12 @@ public class IntegerToken extends Token
     public Integer getIntegerValue ()
     {
         return myIntegerValue;
+    }
+    
+    @Override
+    public String getSymbol ()
+    {
+        return mySymbol;
     }
 
     /**

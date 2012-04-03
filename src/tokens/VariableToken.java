@@ -30,6 +30,7 @@ public class VariableToken extends Token
         super();
         myCharacterValue = variableName.toLowerCase();
         myIntegerValue = 0;
+        mySymbol = "v";
     }
 
     @Override
@@ -67,6 +68,12 @@ public class VariableToken extends Token
     public Integer getIntegerValue ()
     {
         return myIntegerValue;
+    }
+    
+    @Override
+    public String getSymbol ()
+    {
+        return mySymbol;
     }
 
     /**
