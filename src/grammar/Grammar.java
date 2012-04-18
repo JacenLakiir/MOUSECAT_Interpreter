@@ -15,7 +15,7 @@ import parser.ParserException;
  */
 public class Grammar
 {
-    private static final String GRAMMAR_FILE = "src/resources/grammar.txt";
+    private static final String GRAMMAR_FILE = "resources/grammar.txt";
     private static final Scanner GRAMMAR = openGrammar();
     private static final List<Production> PRODUCTION_LIST = initializeProductionList();
     

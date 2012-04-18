@@ -30,7 +30,7 @@ public class Lexer
     
     private File myFile;
     private Scanner myInput;
-    private Queue<String> mySymbolQueue;
+    private Queue<Token> myTokenQueue;
     private Map<String, Token> mySymbolTable;
         
     /**
@@ -40,7 +40,7 @@ public class Lexer
     private Lexer ()
     {
         mySymbolTable = new TreeMap<String, Token>();
-        mySymbolQueue = new LinkedList<String>();
+        myTokenQueue = new LinkedList<Token>();
     }
 
     /**
@@ -133,7 +133,6 @@ public class Lexer
             String[] line = myInput.nextLine().split("\\s+");
             parseLine(lineNumber, line);
         }
-        mySymbolQueue.add("$");
         return;
     }
     
@@ -176,7 +175,10 @@ public class Lexer
      */
     public String getNextSymbol ()
     {
-        return mySymbolQueue.poll();
+        Token nextToken = myTokenQueue.poll();
+        if (nextToken != null)
+            return nextToken.getSymbol();
+        return "$";
     }
     
     public File getFile ()
@@ -228,11 +230,9 @@ public class Lexer
     private void identifyAndStoreToken (String parseableString)
     {
         Token parsedToken = createToken(parseableString);
-        updateSymbolTable(parsedToken);
-        
-        String tokenSymbol = parsedToken.getSymbol();
-        mySymbolQueue.add(tokenSymbol);
-//        boolean isEnteredIntoTable = isUpdateNecessary(parsedToken);
+        boolean updateNeeded = isUpdateNecessary(parsedToken);
+        Token reference = updateSymbolTable(parsedToken, updateNeeded);
+        myTokenQueue.add(reference);
 //        LexerOutput.printTokenOutput(parsedToken, isEnteredIntoTable);
     }
 
@@ -245,9 +245,10 @@ public class Lexer
      * @param parsedToken token to be stored/accessed
      * @return reference to the token stored/accessed
      */
-    private Token updateSymbolTable (Token parsedToken)
+    private Token updateSymbolTable (Token parsedToken, boolean updateNeeded)
     {
-        if (!isUpdateNecessary(parsedToken)) return null;
+        if (!updateNeeded)
+            return parsedToken;
         String charVal = parsedToken.getCharacterValue();
         if (!mySymbolTable.containsKey(charVal))
             mySymbolTable.put(charVal, parsedToken);

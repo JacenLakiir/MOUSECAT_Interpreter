@@ -17,7 +17,7 @@ import java.util.TreeMap;
  */
 public class ParseTable
 {
-    private static final String PARSE_DATA = "src/resources/parsedata.txt";
+    private static final String PARSE_DATA = "resources/parsedata.txt";
     private static final int NUM_OF_STATES = 38;
     private static final int NUM_OF_TERMINALS = 18;
     private static final int NUM_OF_VARIABLES = 4;
