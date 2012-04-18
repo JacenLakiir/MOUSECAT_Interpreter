@@ -45,6 +45,75 @@ public class Entry
     }
     
     /**
+     * Determines whether the right-hand size (rhs) of this
+     * Entry's rule contains two nonterminals.
+     * 
+     * @return true if rhs contains two nonterminals
+     */
+    public boolean containsTwoNonterminalsOnRHS ()
+    {
+        if (myRule == null)
+            return false;
+        int count = 0;
+        String[] symbols = myRule.getRHS().split("\\s+");
+        for (String s : symbols)
+        {
+            if (s.matches("[LS]"))
+                count++;
+        }
+        return (count == 2);
+    }
+    
+    /**
+     * Determines whether the right-hand size (rhs) of this
+     * Entry's rule contains all terminals.
+     * 
+     * @return true if rhs contains all terminals
+     */
+    public boolean containsAllTerminalsOnRHS ()
+    {
+        if (myRule == null)
+            return false;
+        if (myRule.equals(Grammar.getProductionList().get(1)))
+            return true;
+        String[] symbols = myRule.getRHS().split("\\s+");
+        for (String s : symbols)
+        {
+            if (s.matches("[LS]"))
+                return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Determines whether this Entry's rule contains punctuation
+     * on the right-hand side (rhs).
+     * 
+     * @return true if rhs contains punctuation
+     */
+    public boolean hasPunctuationInRHS ()
+    {
+        if (myRule == null)
+            return false;
+        Production rule2 = Grammar.getProductionList().get(2);
+        Production rule3 = Grammar.getProductionList().get(3);
+        return (myRule.equals(rule2) || myRule.equals(rule3));
+    }
+    
+
+    /**
+     * Determines whether this Entry's rule is for repeat statements.
+     * 
+     * @return true if rule is S --> r i L d
+     */
+    public boolean hasRepeatRule ()
+    {
+        if (myRule == null)
+            return false;
+        return (myRule.equals(Grammar.getProductionList().get(10)));
+    }
+    
+    /**
      * Convenience method for getting the left-hand side (lhs) of this
      * Entry's rule.
      * 

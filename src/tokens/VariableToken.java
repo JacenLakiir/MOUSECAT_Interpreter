@@ -17,7 +17,7 @@ public class VariableToken extends Token
 {
     private static final Type myTokenType = Token.Type.VARIABLE;
     private static final Pattern myRegex = Pattern.compile("[A-z|0-9]+");
-    private static String myType = "variable";
+    private static final String myType = "variable";
 
     /**
      * Constructs a new VariableToken whose character value is the given string

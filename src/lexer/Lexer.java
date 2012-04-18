@@ -31,6 +31,7 @@ public class Lexer
     private File myFile;
     private Scanner myInput;
     private Queue<Token> myTokenQueue;
+    private Queue<String> mySymbolQueue;
     private Map<String, Token> mySymbolTable;
         
     /**
@@ -41,6 +42,7 @@ public class Lexer
     {
         mySymbolTable = new TreeMap<String, Token>();
         myTokenQueue = new LinkedList<Token>();
+        mySymbolQueue = new LinkedList<String>();
     }
 
     /**
@@ -120,7 +122,7 @@ public class Lexer
     
     /**
      * Scans the input stream line-by-line for tokens while printing output for
-     * all tokens parsed.
+     * all tokens parsed. Adds an EOF marker ($) once the input stream is empty.
      */
     public void runScanner ()
     {
@@ -133,6 +135,7 @@ public class Lexer
             String[] line = myInput.nextLine().split("\\s+");
             parseLine(lineNumber, line);
         }
+        mySymbolQueue.add("$");
         return;
     }
     
@@ -175,10 +178,17 @@ public class Lexer
      */
     public String getNextSymbol ()
     {
-        Token nextToken = myTokenQueue.poll();
-        if (nextToken != null)
-            return nextToken.getSymbol();
-        return "$";
+        return mySymbolQueue.poll();
+    }
+    
+    /**
+     * Convenience method for retrieving the next token in the queue.
+     * 
+     * @return next token
+     */
+    public Token getNextToken ()
+    {
+        return myTokenQueue.poll();
     }
     
     public File getFile ()
@@ -221,9 +231,9 @@ public class Lexer
 
     /**
      * Creates a token of the appropriate type for the given string and updates
-     * the symbol table. Adds the token's symbol to the queue of symbol scanned
-     * in so far. Output is printed showing the results of the token
-     * identification and storage.
+     * the symbol table. Adds the symbol table's reference to the token and its
+     * symbol to the queues of tokens and symbols scanned in so far. Output is
+     * printed showing the results of the token identification and storage.
      * 
      * @param parseableString
      */
@@ -232,7 +242,9 @@ public class Lexer
         Token parsedToken = createToken(parseableString);
         boolean updateNeeded = isUpdateNecessary(parsedToken);
         Token reference = updateSymbolTable(parsedToken, updateNeeded);
+       
         myTokenQueue.add(reference);
+        mySymbolQueue.add(reference.getSymbol());
 //        LexerOutput.printTokenOutput(parsedToken, isEnteredIntoTable);
     }
 

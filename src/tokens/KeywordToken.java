@@ -14,6 +14,8 @@ public class KeywordToken extends Token
 {
     private static final Type myTokenType = Token.Type.KEYWORD;
     private static final List<String> recognizedKeywords = initializeKeywordList();
+   
+    private String myType;
 
     /**
      * Constructs a new KeywordToken whose keyword is the given string. No

@@ -1,7 +1,14 @@
 package parser;
 
 import grammar.Production;
+import interpreter.InterpreterException;
+import java.util.List;
 import java.util.Stack;
+import syntaxtree.SequenceTreeNode;
+import syntaxtree.SyntaxTreeNode;
+import syntaxtree.SyntaxTreeNodeFactory;
+import tokens.KeywordToken;
+import tokens.Token;
 import lexer.Lexer;
 
 /**
@@ -15,13 +22,18 @@ public class Parser
     private static Parser myParser;
 
     // state of the parser
+    private final List<SyntaxTreeNodeFactory> typesOfNodes =
+            SyntaxTreeNodeFactory.initialize();
+
     private String myState;
+    private Token myToken;
     private String mySymbol;
     private boolean wasFileChosen;
     
     private ParseTable myTable;
     private Stack<String> myParseStack;
     private Stack<Production> myRuleStack;
+    private Stack<Object> mySTstack;
    
     /**
      * Private constructor used for restricting instantiation of Parser objects.
@@ -30,11 +42,13 @@ public class Parser
     private Parser ()
     {
         myState = "0";
-        mySymbol = "";
+        myToken = Lexer.getInstance().getNextToken();
+        mySymbol = Lexer.getInstance().getNextSymbol();
         wasFileChosen = Lexer.getInstance().wasFileChosen();
         
         myParseStack = new Stack<String>();
         myRuleStack = new Stack<Production>();
+        mySTstack = new Stack<Object>();
     }
 
     /**
@@ -72,13 +86,15 @@ public class Parser
         if (!wasFileChosen)     return;
         
         myParseStack.push(myState);
-        mySymbol = Lexer.getInstance().getNextSymbol();
         
         Entry entry = myTable.lookupEntry(myState, mySymbol);
         String action = entry.getAction();
         
         while (!Entry.isAccept(action))
         {
+            System.out.println(mySTstack);
+            System.out.println();
+            
             if (Entry.isShift(action))
             {
                 performShift(entry);
@@ -95,13 +111,21 @@ public class Parser
             entry = myTable.lookupEntry(myState, mySymbol);
             action = entry.getAction();
         }
-        
+        System.out.println(mySTstack);
         if (!mySymbol.equals("$"))
         {
             ParserOutput.reportError();
         }
         
         ParserOutput.printDerivations(myRuleStack);
+    }
+    
+    public SyntaxTreeNode getSyntaxTreeRoot ()
+    {
+        if (mySTstack.size() != 1)
+            throw new InterpreterException("Syntax tree does not have one root: " + mySTstack.size()
+                                           + "elements left", InterpreterException.Type.NO_SHARED_ROOT);
+        return (SyntaxTreeNode) mySTstack.peek();
     }
 
     /**
@@ -113,9 +137,13 @@ public class Parser
      */
     private void performShift (Entry entry)
     {
+        System.out.println("SHIFTING:\t" + myToken.getSymbol());
+        mySTstack.push(myToken);
         myParseStack.push(mySymbol);
         myState = entry.getState();
         myParseStack.push(myState);
+        
+        myToken = Lexer.getInstance().getNextToken();
         mySymbol = Lexer.getInstance().getNextSymbol();
     }
 
@@ -130,6 +158,9 @@ public class Parser
     private void performReduce (Entry entry)
     {
         int sizeOfRHS = entry.sizeOfRHS();
+        
+        updateSyntaxTree(entry, sizeOfRHS);   
+        
         for (int i = 0; i < 2*sizeOfRHS; i++)
             myParseStack.pop();
         myState = myParseStack.peek();
@@ -139,6 +170,49 @@ public class Parser
         
         myState = myTable.lookupEntry(myState, entry.ruleLHS()).getState();
         myParseStack.push(myState);
+    }
+
+    private void updateSyntaxTree (Entry entry, int sizeOfRHS)
+    {
+        System.out.println("REDUCING:\t" + entry.getRule());
+        
+        if (entry.hasPunctuationInRHS())
+            mySTstack.pop();    // discard punctuation symbol
+        
+        if (entry.containsTwoNonterminalsOnRHS())
+        {
+            System.out.println("Nonterminals");
+            SyntaxTreeNode left = (SyntaxTreeNode) mySTstack.pop();
+            SyntaxTreeNode right = (SyntaxTreeNode) mySTstack.pop();
+            SyntaxTreeNode sharedRoot = new SequenceTreeNode(left, right);
+            mySTstack.push(sharedRoot);
+        }
+        
+        else if ((entry.containsAllTerminalsOnRHS() && sizeOfRHS > 1) || entry.hasRepeatRule())
+        {
+            System.out.println("Terminals\t" + sizeOfRHS);
+            
+            Object[] stStackObjects = new Object[sizeOfRHS-1];
+            for (int i = 0; i < sizeOfRHS-1; i++)
+                stStackObjects[sizeOfRHS-2-i] = mySTstack.pop();
+            
+            KeywordToken keyword = (KeywordToken) mySTstack.pop();
+            System.out.println(keyword);
+
+            for (SyntaxTreeNodeFactory nodeType : typesOfNodes)
+            {
+                if (nodeType.isThisTypeOfNode(keyword))
+                {
+                    SyntaxTreeNode reducedNode =
+                            nodeType.createThisTypeOfNode(stStackObjects);
+                    System.out.println(reducedNode.getClass().getName());
+                    mySTstack.push(reducedNode);
+                    return;
+                }
+            }
+            throw new InterpreterException("No node created: " + stStackObjects,
+                                           InterpreterException.Type.NO_NODE_CREATED);
+        }
     }
     
 }
